@@ -1,0 +1,4 @@
+{% for mondod_host, repset in mongod_repset_members.interitems() %}
+sh.addShard("{{ repset}}/{{ mongod_host }}:{{ mongod_port }}")
+printjson(rs.status())
+{% endfor %}

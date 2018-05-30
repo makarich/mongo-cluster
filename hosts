@@ -1,0 +1,31 @@
+#The list of mongodb configuration servers, make sure it is 1 or 3
+[mongoc_servers]
+mongoc1
+mongoc2 
+
+# Shard replica set 1 for prod 3 servers in replica
+[rs1]
+mongod1
+mongod2
+
+# Shard replica set 2 for prod 3 servers in replica
+[rs2]
+mongod3
+mongod4
+
+# Shard replica set ... N for prod 3 servers in replica
+#[rs..n]
+#mongod3
+#mongod4
+
+[mongo:children]
+rs1
+rs2
+#rs..N
+
+
+#Te list of servers where mongos servers would run.
+[mongos_servers]
+mongos1
+
+

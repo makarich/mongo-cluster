@@ -1,0 +1,10 @@
+rs.initiate(
+{
+_id : "{{ mongod_replset_name }}",
+members: [
+  {% for node in mongod_repl_servers %}
+    { _id : {{loop.index}}, host: "{{node}}:{{mongod_port}}" },
+  {% endfor %}
+]
+}
+)

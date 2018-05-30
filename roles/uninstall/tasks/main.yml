@@ -1,0 +1,38 @@
+---
+
+- name: Remove mongoc_service
+  systemd:
+    name: mongoc
+    daemon_reload: yes
+    enabled: no
+    state: stopped
+  when: "'mongoc_servers' in group_names"
+
+- name: Remove datadir
+  file:
+    state: absent
+    path: "{{ mongodb_datadir_prefix }}configdb"
+  when: "'mongoc_servers' in group_names"
+
+- name: Remove mongod_service
+  systemd:
+    name: mongod-{{ inventory_hostname }}
+    daemon_reload: yes
+    enabled: no
+    state: stopped
+  when: "'mongo' in group_names"
+
+- name: Remove datadir
+  file:
+    state: absent
+    path: "{{ mongodb_datadir_prefix }}/mongo-{{ inventory_hostname }}"
+  when: "'mongo' in group_names"
+
+- name: Remove mongos_service
+  systemd:
+    name: mongos
+    daemon_reload: yes
+    enabled: no
+    state: stopped
+  when: "'mongos_servers' in group_names"
+

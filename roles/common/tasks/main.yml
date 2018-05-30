@@ -1,0 +1,66 @@
+---
+
+# This Playbook runs all the common plays in the deployment
+
+- name: Create the repository for mongodb
+  copy: src=mongodb-org.repo dest=/etc/yum.repos.d/mongodb-org.repo
+  when: mongo_repo == 1
+
+- name: Install the mongodb package
+  yum: name={{ item }} state=present
+  with_items:
+   - mongodb-org-shell
+   - mongodb-org-server
+   - mongodb-org-tools
+   - mongodb-org-mongos
+
+- name: Disable SELinux
+  selinux: state=disabled
+
+- name: Set SELinux in permissive mode until the machine is rebooted
+  command: setenforce 0
+  ignore_errors: true
+  changed_when: false
+
+- name: install hugepages init script
+  copy: 
+    src: disable-transparent-hugepages 
+    dest: /etc/rc.d/init.d/dth
+    owner: root
+    group: root
+    mode: 0755
+
+- name: enable transparent-hugepages service
+  service:
+    name: dth
+    enabled: true
+    state: started
+
+- name: enable logrotate for mongod log files
+  copy: src=mongod.logrotate dest=/etc/logrotate.d/mongod owner=root group=root mode=0644
+
+- name: Inc limits for mongod
+  copy: src=99-mongodb-nproc.conf dest=/etc/security/limits.d/99-mongodb-nproc.conf owner=root group=root mode=0644
+  become: true
+
+- name: Create the mongod user
+  user: name=mongod comment="MongoD"
+
+- name: Create the data directory for the namenode metadata
+  file: path={{ mongodb_datadir_prefix }} owner=mongod group=mongod state=directory recurse=true
+
+- name: create log directory for mongodb
+  file: path=/var/log/mongo state=directory owner=mongod group=mongod recurse=true
+
+- name: create run directory for mongodb
+  file: path=/var/run/mongo state=directory owner=mongod group=mongod recurse=true
+
+- name: Update hosts file
+  template: src=hosts.j2 dest=/etc/hosts
+  
+- name: be sure firewalld is disabled
+  systemd: name=firewalld enabled=no
+
+- name: be sure firewalld is stopped
+  systemd: name=firewalld state=stopped
+  ignore_errors: yes

@@ -1,0 +1,12 @@
+su mongod mongod
+
+/var/log/mongodb/*.log {
+  daily
+  missingok
+  rotate 5
+  compress
+  dateext
+  delaycompress
+  copytruncate
+  notifempty
+}

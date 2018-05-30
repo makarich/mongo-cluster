@@ -1,0 +1,5 @@
+mongod_repl_master: mongod1
+mongod_replset_name: rs1
+mongod_repl_servers:
+  - mongod1
+  - mongod2

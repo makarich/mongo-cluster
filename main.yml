@@ -1,0 +1,24 @@
+---
+
+- hosts: all
+  roles:
+    - common
+  become: true
+
+- hosts: mongoc_servers
+  roles:
+    - mongoc
+  become: true
+
+- hosts: mongo
+  roles:
+    - mongod
+  become: true
+
+- hosts: mongos_servers
+  roles:
+    - mongos
+  become: true
+
+
+
